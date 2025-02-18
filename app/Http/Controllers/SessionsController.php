@@ -50,6 +50,11 @@ class SessionsController extends Controller
             return redirect()->back()->withInput();
         }
 
+        if (!Auth::user()->activated) {
+            session()->flash('warning', 'You have not activated your account yet. Please check your email for the activation link.');
+            return redirect('/');
+        }
+
         session()->flash('success', 'Welcome back!');
         $fallback = route('users.show', Auth::user());
         return redirect()->intended($fallback);

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Str;
 
 /**
  * Class User
@@ -48,6 +49,19 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * 监听用户创建事件, 在用户创建时自动生成激活令牌
+     *
+     * @return void
+     */
+    public static function boot(): void
+    {
+        parent::boot();
+        static::creating(function ($user) {
+            $user->activation_token = Str::random(10);
+        });
+    }
 
     /**
      * 通过邮箱到 gravatar.com 获取头像
