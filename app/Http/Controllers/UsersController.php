@@ -17,14 +17,16 @@ class UsersController extends Controller
 {
     public function __construct()
     {
-        // 除了 show、create、store、index 方法，其他方法都需要登录
         $this->middleware('auth', [
             'except' => ['show', 'create', 'store', 'index', 'confirmEmail']
         ]);
 
-        // 只允许未登录用户访问注册页面, 即 create 方法
         $this->middleware('guest', [
             'only' => ['create']
+        ]);
+
+        $this->middleware('throttle:10,60', [
+            'only' => ['store']
         ]);
     }
 
@@ -57,7 +59,10 @@ class UsersController extends Controller
      */
     public function show(User $user): View|Factory|Application
     {
-        return view('users.show', compact('user'));
+        $statuses = $user->statuses()
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+        return view('users.show', compact('user', 'statuses'));
     }
 
     /**
@@ -92,12 +97,11 @@ class UsersController extends Controller
     {
         $view = 'emails.confirm';
         $data = compact('user');
-        $from = 'lustormstout@gmail.com';
-        $name = 'LuStormstout\'s Blog';
         $to = $user->email;
-        $subject = 'Thanks for registering LuStormstout\'s Blog! Please confirm your email address.';
-        Mail::send($view, $data, function ($message) use ($from, $name, $to, $subject) {
-            $message->from($from, $name)->to($to)->subject($subject);
+        $subject = 'Thanks for registering Mina\'s Blog! Please confirm your email address.';
+
+        Mail::send($view, $data, function ($message) use ($to, $subject) {
+            $message->to($to)->subject($subject);
         });
     }
 

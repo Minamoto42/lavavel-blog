@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Str;
@@ -73,5 +73,16 @@ class User extends Authenticatable
     {
         $hash = md5(trim(strtolower($this->attributes['email'])));
         return "https://www.gravatar.com/avatar/$hash?s=$size";
+    }
+
+    /**
+     * The user has many statuses.
+     *
+     * @return HasMany
+     */
+    public function statuses(): HasMany
+    {
+        // 一个用户拥有多条微博
+        return $this->hasMany(Status::class);
     }
 }
