@@ -34,7 +34,7 @@ class Status extends Model
      */
     public function user(): BelongsTo
     {
-        // 一条微博一个用户
+        // 一条一个用户
         return $this->belongsTo(User::class);
     }
 }
